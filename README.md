@@ -61,3 +61,37 @@ PY
 ```
 python -c "from matplotlib import font_manager as fm; _=fm.FontManager(); print('Matplotlib font cache ready')"
 ```
+
+## Szybsze pobieranie (HF Transfer)
+
+- W niektórych środowiskach przyspiesza pobieranie modeli:
+```
+python -m pip install -U huggingface_hub hf_transfer
+export HF_HUB_ENABLE_HF_TRANSFER=1
+# (opcjonalnie) huggingface-cli login
+```
+
+## Mniejszy model do szybkich testów
+
+- Zamiast dużego Parakeet ustaw tymczasowo mniejszy ASR, np.:
+```
+export ASR_MODEL_NAME="stt_en_fastconformer_ctc_small"
+python app.py
+```
+Po testach wróć do domyślnego Parakeet.
+
+## Hypotheses — o co chodzi z liczbami?
+
+- `return_hypotheses=True` zwraca listę obiektów hipotez (a nie czysty tekst).
+- `hyp.text` — zdekodowany tekst; `hyp.score` — log‑prawdopodobieństwo (zwykle ujemne);
+  `hyp.y_sequence` — numery ID tokenów (stąd „dziwna tablica numerków”).
+- Minimalny przykład:
+```
+python - <<'PY'
+import nemo.collections.asr as asr
+m = asr.models.ASRModel.from_pretrained('nvidia/parakeet-tdt-0.6b-v3')
+hyp = m.transcribe(['sample.wav'], return_hypotheses=True)[0]
+print('TEXT:', hyp.text)
+print('SCORE:', hyp.score)
+PY
+```
