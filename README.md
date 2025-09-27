@@ -80,18 +80,52 @@ python app.py
 ```
 Po testach wróć do domyślnego Parakeet.
 
-## Hypotheses — o co chodzi z liczbami?
+## Hypotheses — wyjaśnienie
 
-- `return_hypotheses=True` zwraca listę obiektów hipotez (a nie czysty tekst).
-- `hyp.text` — zdekodowany tekst; `hyp.score` — log‑prawdopodobieństwo (zwykle ujemne);
-  `hyp.y_sequence` — numery ID tokenów (stąd „dziwna tablica numerków”).
-- Minimalny przykład:
+- Czym jest hipoteza: pojedynczy kandydat transkrypcji wygenerowany przez model ASR.
+- Co zwraca NeMo:
+  - Bez opcji: `transcribe(...) -> List[str]` (sam tekst najlepszej hipotezy).
+  - Z opcją: `transcribe(..., return_hypotheses=True) -> List[Hypothesis]`.
+- Pola w `Hypothesis` (najważniejsze):
+  - `text` — zdekodowany tekst (to zwykle chcesz pokazać użytkownikowi).
+  - `score` — wynik w skali log‑prawdopodobieństwa (zwykle ujemny). Bliżej 0 = „lepszy” w porównaniu do innych hipotez dla TEGO samego nagrania i modelu.
+  - `y_sequence` — sekwencja ID tokenów (wewnętrzna reprezentacja przed dekodowaniem; stąd „tablica numerków”).
+
+Jak interpretować `score`:
+- Nie jest to „% pewności”. To suma/miara log‑prawdopodobieństw, więc dłuższe klipy często mają bardziej ujemne wartości.
+- Porównuj tylko hipotezy wygenerowane dla TEGO SAMEGO nagrania i modelu (ranking). Nie porównuj wartości między różnymi klipami czy modelami.
+- Jeśli chcesz przybliżone porównanie między klipami, możesz policzyć „score na token” (np. `score / len(y_sequence)`), ale traktuj to orientacyjnie.
+
+Po co hipotezy (n‑best):
+- Debugowanie i analiza jakości (czy druga/trzecia propozycja nie jest lepsza?).
+- Reguły post‑processingowe albo dodatkowe modele (np. language model) mogą „przeważać” między kilkoma kandydatami.
+
+Krótkie przykłady
 ```
+# 1) Najlepsza hipoteza (tekst + wynik)
 python - <<'PY'
 import nemo.collections.asr as asr
 m = asr.models.ASRModel.from_pretrained('nvidia/parakeet-tdt-0.6b-v3')
-hyp = m.transcribe(['sample.wav'], return_hypotheses=True)[0]
-print('TEXT:', hyp.text)
-print('SCORE:', hyp.score)
+h = m.transcribe(['sample.wav'], return_hypotheses=True)[0]
+print('TEXT:', h.text)
+print('SCORE (logP):', h.score)
+PY
+
+# 2) Top-3 hipotezy (jeśli dekoder je zwraca)
+python - <<'PY'
+import nemo.collections.asr as asr
+m = asr.models.ASRModel.from_pretrained('nvidia/parakeet-tdt-0.6b-v3')
+hyps = m.transcribe(['sample.wav'], return_hypotheses=True)
+for i, hyp in enumerate(hyps[:3], 1):
+    print(f'#{i}', hyp.score, hyp.text)
+PY
+
+# 3) Zamiana ID tokenów na tekst (ciekawostka)
+python - <<'PY'
+import nemo.collections.asr as asr
+m = asr.models.ASRModel.from_pretrained('nvidia/parakeet-tdt-0.6b-v3')
+h = m.transcribe(['sample.wav'], return_hypotheses=True)[0]
+ids = h.y_sequence.tolist()
+print(m.tokenizer.ids_to_text(ids))
 PY
 ```
