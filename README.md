@@ -1,5 +1,7 @@
 # simple_speech_to_text_with_parakeet
 
+[![GitHub](https://img.shields.io/badge/GitHub-drswobodziczka%2Fspeechtotext__with__gradio__and__nvidia-181717?logo=github)](https://github.com/drswobodziczka/speechtotext_with_gradio_and_nvidia)
+
 Jednookienkowy transkryptor audio→tekst (Gradio + NVIDIA NeMo Parakeet) z automatycznym wyborem urządzenia (CPU/MPS/CUDA).
 „To prosty projekt do szybkiej transkrypcji audio bez konfiguracji serwera.”
 
@@ -133,3 +135,7 @@ PY
 ## Credits
 
 - Based on: https://huggingface.co/spaces/areksmyk/speechtotext/tree/main
+
+## Repository
+
+- GitHub: https://github.com/drswobodziczka/speechtotext_with_gradio_and_nvidia
