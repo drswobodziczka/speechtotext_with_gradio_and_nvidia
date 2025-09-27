@@ -1,0 +1,8 @@
+gradio
+torch
+nemo_toolkit[asr]
+pydub
+onnx
+onnxruntime
+ml_dtypes
+
