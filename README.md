@@ -46,3 +46,18 @@ Otwórz link Gradio z terminala.
 - `ASRModel.transcribe()` zwraca listę stringów; po hipotezy użyj: `transcribe(..., return_hypotheses=True)` i `transcriptions[0].text`.
 - (Apple Silicon) można ustawić: `export PYTORCH_ENABLE_MPS_FALLBACK=1`.
 
+## Warm-up (opcjonalnie)
+
+- Pre‑pull modelu do cache (szybszy start UI):
+```
+python - <<'PY'
+import nemo.collections.asr as asr
+asr.models.ASRModel.from_pretrained('nvidia/parakeet-tdt-0.6b-v3')
+print('Model w cache')
+PY
+```
+
+- Zbudowanie cache czcionek Matplotlib (jednorazowo):
+```
+python -c "from matplotlib import font_manager as fm; _=fm.FontManager(); print('Matplotlib font cache ready')"
+```
