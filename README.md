@@ -129,3 +129,7 @@ ids = h.y_sequence.tolist()
 print(m.tokenizer.ids_to_text(ids))
 PY
 ```
+
+## Credits
+
+- Based on: https://huggingface.co/spaces/areksmyk/speechtotext/tree/main
